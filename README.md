@@ -1,6 +1,8 @@
 # 🏠 Real Estate Platform API
 
-![ER Diagram](https://github.com/user-attachments/assets/60247070-1925-4814-920a-284b52a3f5b6)
+## ER Diagram
+
+[![Download](https://img.shields.io/badge/Download-blue?style=for-the-badge&logo=adobeacrobatreader&logoColor=white)](https://github.com/user-attachments/files/25509336/ER.Diagram.pdf)
 
 Production-Grade Real Estate Platform API
 
