@@ -1,5 +1,7 @@
 # 🏠 Real Estate Platform API
 
+![ER Diagram](https://github.com/user-attachments/assets/60247070-1925-4814-920a-284b52a3f5b6)
+
 Production-Grade Real Estate Platform API
 
 ---
