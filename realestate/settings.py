@@ -31,25 +31,24 @@ PAYMENT_WEBHOOK_SECRET = "mydemo123"
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'accounts',
-    'properties',   
-    'payments',
-    'reviews',
-    'subscriptions',
-    'notifications',
-    'enquiries',
-    'rest_framework',
-    'chat',
-    'favorites',
-
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "accounts",
+    "properties",
+    "payments",
+    "reviews",
+    "subscriptions",
+    "notifications",
+    "enquiries",
+    "facility",
+    "chat",
+    "favorites",
 ]
 AUTH_USER_MODEL = "accounts.User"
 REST_FRAMEWORK = {
@@ -139,4 +138,3 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 AUTH_USER_MODEL = 'accounts.User'
-
