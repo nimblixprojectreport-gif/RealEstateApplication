@@ -6,6 +6,10 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
 
+    path('notification/', include('notifications.urls')),
+    path('api/', include('accounts.urls')),
+
+
     # Payments
     path("api/v1/payments/", include("payments.urls")),
 
