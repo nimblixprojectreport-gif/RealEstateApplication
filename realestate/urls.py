@@ -7,6 +7,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('notification/', include('notifications.urls')),
+
+    path('api/enquiries/', include('enquiries.urls')),
+    path("api/", include("properties.urls")),
+]
+
     path('api/', include('accounts.urls')),
 
 
@@ -24,3 +29,4 @@ urlpatterns = [
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 
 ]
+
