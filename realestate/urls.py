@@ -1,11 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
-<<<<<<< HEAD
 from django.http import HttpResponse
-
-from django.contrib import admin
-from django.urls import path, include
-from django.http import HttpResponse
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
 def home(request):
@@ -14,24 +10,19 @@ def home(request):
 
 urlpatterns = [
     path('', home),
-=======
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-urlpatterns = [
-
->>>>>>> e322f857aafd2310c4b587e7ca971ae597f62ad0
     path('admin/', admin.site.urls),
 
     path('notification/', include('notifications.urls')),
 
     path('api/enquiries/', include('enquiries.urls')),
-<<<<<<< HEAD
+
     path('api/', include('properties.urls')),
     path("api/chat/", include("chat.urls")),
-]
-=======
+
+
     path("api/", include("properties.urls")),
-]
+
 
     path('api/', include('accounts.urls')),
 
@@ -51,4 +42,4 @@ urlpatterns = [
 
 ]
 
->>>>>>> e322f857aafd2310c4b587e7ca971ae597f62ad0
+
