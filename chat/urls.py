@@ -1,10 +1,14 @@
+
+from django.urls import path
 from rest_framework.routers import DefaultRouter
-from .views import ConversationViewSet
+from .views import ConversationViewSet, chatbot_api
 
 router = DefaultRouter()
 router.register(r'conversations', ConversationViewSet, basename='conversation')
 
-urlpatterns = router.urls
+urlpatterns = router.urls + [
+    path("chatbot/", chatbot_api, name="chatbot"),
+]
 
 
 """DefaultRouter() automatically creates URLs.
@@ -32,3 +36,5 @@ POST    /conversations/{id}/send_message/
 PATCH   /conversations/{id}/mark_read/
 
 You don’t manually write them. Router does it."""
+=======
+

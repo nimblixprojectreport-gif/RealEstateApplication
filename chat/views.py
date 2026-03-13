@@ -1,11 +1,17 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.db.models import Q
+
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
+from .services import chatbot_reply
 
+
+# =====================================
+# CONVERSATION VIEWSET (User Messaging)
+# =====================================
 
 class ConversationViewSet(viewsets.ModelViewSet):
     serializer_class = ConversationSerializer
@@ -79,3 +85,24 @@ class ConversationViewSet(viewsets.ModelViewSet):
             {"message": "Conversation deleted successfully"},
             status=status.HTTP_204_NO_CONTENT
         )
+
+
+# =====================================
+# CHATBOT API
+# =====================================
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def chatbot_api(request):
+
+    if not request.data:
+        return Response({"error": "No JSON data sent"}, status=400)
+
+    message = request.data.get("message")
+
+    if not message:
+        return Response({"error": "Message field required"}, status=400)
+
+    response = chatbot_reply(request.user, message)
+
+    return Response(response)

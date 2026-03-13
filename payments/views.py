@@ -1,21 +1,19 @@
 import uuid
 import razorpay
 
-from rest_framework import generics, permissions, status
-from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from rest_framework.response import Response
+from rest_framework import permissions, status, generics
 from django.conf import settings
 
 from .models import Payment
-from subscriptions.models import Subscription
 from .serializers import PaymentSerializer, PaymentCreateSerializer
+from subscriptions.models import UserSubscription
 
 
-# ======================================================
+# ==========================================
 # CREATE PAYMENT (RAZORPAY ORDER CREATION)
-# ======================================================
-
+# ==========================================
 class CreatePaymentView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -25,36 +23,25 @@ class CreatePaymentView(APIView):
         serializer.is_valid(raise_exception=True)
 
         try:
-            subscription = Subscription.objects.get(
+            subscription = UserSubscription.objects.get(
                 id=serializer.validated_data["subscription_id"]
             )
-        except Subscription.DoesNotExist:
-            return Response(
-                {"error": "Subscription not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        except UserSubscription.DoesNotExist:
+            return Response({"error": "Subscription not found"}, status=status.HTTP_404_NOT_FOUND)
 
         if subscription.user != request.user:
-            return Response(
-                {"error": "You cannot pay for another user's subscription"},
-                status=status.HTTP_403_FORBIDDEN
-            )
+            return Response({"error": "Cannot pay for another user's subscription"}, status=status.HTTP_403_FORBIDDEN)
 
         # Prevent duplicate pending payments
         if Payment.objects.filter(subscription=subscription, status="pending").exists():
-            return Response(
-                {"error": "Payment already pending for this subscription"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "Payment already pending"}, status=status.HTTP_400_BAD_REQUEST)
 
         amount = serializer.validated_data["amount"]
 
-        # Razorpay client
         client = razorpay.Client(
             auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
         )
 
-        # Create Razorpay Order
         order = client.order.create({
             "amount": int(amount * 100),
             "currency": "INR",
@@ -71,22 +58,18 @@ class CreatePaymentView(APIView):
             status="pending"
         )
 
-        return Response(
-            {
-                "success": True,
-                "message": "Razorpay order created",
-                "order_id": order["id"],
-                "razorpay_key": settings.RAZORPAY_KEY_ID,
-                "payment": PaymentSerializer(payment).data
-            },
-            status=status.HTTP_201_CREATED
-        )
+        return Response({
+            "success": True,
+            "message": "Razorpay order created",
+            "order_id": order["id"],
+            "razorpay_key": settings.RAZORPAY_KEY_ID,
+            "payment": PaymentSerializer(payment).data
+        }, status=status.HTTP_201_CREATED)
 
 
-# ======================================================
+# ==========================================
 # VERIFY RAZORPAY PAYMENT
-# ======================================================
-
+# ==========================================
 class VerifyRazorpayPayment(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -96,9 +79,7 @@ class VerifyRazorpayPayment(APIView):
         order_id = request.data.get("razorpay_order_id")
 
         try:
-            payment = Payment.objects.get(
-                gateway_transaction_id=order_id
-            )
+            payment = Payment.objects.get(gateway_transaction_id=order_id)
         except Payment.DoesNotExist:
             return Response({"error": "Payment not found"}, status=404)
 
@@ -106,7 +87,6 @@ class VerifyRazorpayPayment(APIView):
         payment.status = "success"
         payment.save()
 
-        # Activate subscription
         payment.subscription.status = "active"
         payment.subscription.save()
 
@@ -117,10 +97,9 @@ class VerifyRazorpayPayment(APIView):
         })
 
 
-# ======================================================
+# ==========================================
 # USER PAYMENT HISTORY
-# ======================================================
-
+# ==========================================
 class MyPaymentsView(generics.ListAPIView):
     serializer_class = PaymentSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -129,20 +108,18 @@ class MyPaymentsView(generics.ListAPIView):
         return Payment.objects.filter(user=self.request.user)
 
 
-# ======================================================
+# ==========================================
 # ADMIN: ALL PAYMENTS
-# ======================================================
-
+# ==========================================
 class AllPaymentsAdminView(generics.ListAPIView):
     serializer_class = PaymentSerializer
     permission_classes = [permissions.IsAdminUser]
     queryset = Payment.objects.all().order_by("-created_at")
 
 
-# ======================================================
+# ==========================================
 # ADMIN UPDATE PAYMENT STATUS
-# ======================================================
-
+# ==========================================
 class UpdatePaymentStatusView(APIView):
     permission_classes = [permissions.IsAdminUser]
 
@@ -155,13 +132,8 @@ class UpdatePaymentStatusView(APIView):
 
         new_status = request.data.get("status")
 
-        allowed_status = ["pending", "success", "failed", "refunded"]
-
-        if new_status not in allowed_status:
-            return Response(
-                {"error": f"Invalid status. Allowed: {allowed_status}"},
-                status=400
-            )
+        if new_status not in ["pending", "success", "failed", "refunded"]:
+            return Response({"error": "Invalid status"}, status=400)
 
         payment.status = new_status
         payment.save()
@@ -177,10 +149,9 @@ class UpdatePaymentStatusView(APIView):
         })
 
 
-# ======================================================
+# ==========================================
 # PAYMENT WEBHOOK
-# ======================================================
-
+# ==========================================
 class PaymentWebhookView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -189,21 +160,13 @@ class PaymentWebhookView(APIView):
         secret = request.headers.get("X-WEBHOOK-SECRET")
 
         if secret != settings.PAYMENT_WEBHOOK_SECRET:
-            return Response(
-                {"error": "Invalid webhook secret"},
-                status=403
-            )
+            return Response({"error": "Invalid webhook secret"}, status=403)
 
         payment_id = request.data.get("payment_id")
         new_status = request.data.get("status")
 
-        allowed_status = ["success", "failed"]
-
-        if new_status not in allowed_status:
-            return Response(
-                {"error": f"Invalid status. Allowed: {allowed_status}"},
-                status=400
-            )
+        if new_status not in ["success", "failed"]:
+            return Response({"error": "Invalid status"}, status=400)
 
         try:
             payment = Payment.objects.get(id=payment_id)
