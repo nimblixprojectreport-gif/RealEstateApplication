@@ -9,10 +9,10 @@ from .views import (
 )
 
 urlpatterns = [
-    path('create/', create_property),
-    path('', search_properties),  # list + search
-    path('<int:id>/', property_detail),
-    path('<int:id>/update/', update_property),
-    path('<int:id>/delete/', delete_property),
-    path('my/', my_listings),
+    path("create/", create_property),
+    path("", search_properties),
+    path("<uuid:id>/", property_detail),
+    path("<uuid:id>/update/", update_property),
+    path("<uuid:id>/delete/", delete_property),
+    path("my/", my_listings),
 ]
