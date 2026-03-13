@@ -28,6 +28,10 @@ DEBUG = True
 ALLOWED_HOSTS = []
 PAYMENT_WEBHOOK_SECRET = "mydemo123"
 
+#razorpay
+RAZORPAY_KEY_ID = "rzp_test_SPuiSAly8yVWvk"
+RAZORPAY_KEY_SECRET = "6w5WiEIjp1LNmSXmLK073yvO"
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -49,6 +53,7 @@ INSTALLED_APPS = [
     "facility",
     "chat",
     "favorites",
+    "properties_owner",
 ]
 AUTH_USER_MODEL = "accounts.User"
 REST_FRAMEWORK = {
@@ -77,7 +82,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
+CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'realestate.urls'
 
 TEMPLATES = [
@@ -149,3 +154,4 @@ STATICFILES_DIRS = [
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
+
