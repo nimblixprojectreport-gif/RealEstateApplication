@@ -31,6 +31,7 @@ urlpatterns = [
     # Payments
 
     path("admin/", admin.site.urls),
+
     path("properties_owner/", include("properties_owner.urls")),
     path("api/properties/", include("properties.urls")),
     path("api/", include("accounts.urls")),
@@ -41,11 +42,18 @@ urlpatterns = [
 
     path("api/v1/payments/", include("payments.urls")),
     path("subscription/", include("subscriptions.urls")),
-    # Your Reviews API
+
+    # Reviews API
     path("api/", include("reviews.urls")),
-    # Teammate APIs
+
+    # Notifications
     path("notification/", include("notifications.urls")),
+
+    # Chats
+    path("api/chat/", include("chat.urls")),
+
     # JWT Authentication
     path("api/token/", TokenObtainPairView.as_view(), name="token_login"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+]
 
