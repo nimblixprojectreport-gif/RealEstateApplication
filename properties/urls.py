@@ -7,6 +7,7 @@ from .views import (
     delete_property,
     my_listings
 )
+from .views import PropertyPriceByLocationView
 
 urlpatterns = [
     path("create/", create_property),
@@ -15,4 +16,5 @@ urlpatterns = [
     path("<uuid:id>/update/", update_property),
     path("<uuid:id>/delete/", delete_property),
     path("my/", my_listings),
+    path("location-price/", PropertyPriceByLocationView.as_view(), name="location-price"),
 ]

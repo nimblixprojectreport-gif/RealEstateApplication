@@ -36,5 +36,5 @@ POST    /conversations/{id}/send_message/
 PATCH   /conversations/{id}/mark_read/
 
 You don’t manually write them. Router does it."""
-=======
+
 

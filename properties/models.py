@@ -10,6 +10,7 @@ class Property(models.Model):
 
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    base_price = models.DecimalField(max_digits=12, decimal_places=2)
     price = models.DecimalField(max_digits=12, decimal_places=2)
 
     listing_type = models.CharField(max_length=20)
@@ -33,6 +34,23 @@ class Property(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
+
+    #Location based pricing
+    def get_location_price(self):
+
+        location_multiplier = {
+            "bangalore": 1.5,
+            "hyderabad": 1.3,
+            "chennai": 1.2,
+            "mumbai": 1.7
+        }
+
+        multiplier = location_multiplier.get(self.city.lower(), 1)
+
+        return float(self.base_price) * multiplier
+
+    def __str__(self):
+        return self.title
 
 
 class PropertyImage(models.Model):
