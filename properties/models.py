@@ -10,7 +10,7 @@ class Property(models.Model):
 
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    base_price = models.DecimalField(max_digits=12, decimal_places=2)
+    base_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     price = models.DecimalField(max_digits=12, decimal_places=2)
 
     listing_type = models.CharField(max_length=20)
