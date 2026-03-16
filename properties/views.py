@@ -1,9 +1,13 @@
 import json
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from .models import Property
+from .serializers import PropertySerializer
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-
 from .models import Property
 
 
@@ -106,6 +110,7 @@ def create_property(request):
         title=payload["title"],
         description=payload.get("description", ""),
         price=payload["price"],
+        base_price=payload.get("base_price"),
         listing_type=payload["listing_type"],
         property_type=payload["property_type"],
         status=payload["status"],
@@ -237,3 +242,35 @@ def my_listings(request):
     return JsonResponse(
         {"success": True, "count": len(data), "results": data}, status=200
     )
+
+# Property price by location
+class PropertyPriceByLocationView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        print(request.data)
+
+        city = request.GET.get("city")
+
+        if not city:
+            return Response(
+                {"error": "city is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        properties = Property.objects.filter(city__iexact=city)
+        data = []
+
+        for property in properties:
+            data.append({
+                "id": property.id,
+                "title": property.title,
+                "city": property.city,
+                "base_price": property.base_price,
+                "location_price": property.get_location_price()
+            })
+
+        
+
+        return Response(data, status=status.HTTP_200_OK)

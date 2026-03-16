@@ -1,4 +1,5 @@
 from django.urls import path
+from .views import PropertyPriceByLocationView
 from .views import (
     create_property,
     search_properties,
@@ -15,4 +16,5 @@ urlpatterns = [
     path("<uuid:id>/update/", update_property),
     path("<uuid:id>/delete/", delete_property),
     path("my/", my_listings),
+    path("location-price/", PropertyPriceByLocationView.as_view(), name="location-price"),
 ]
