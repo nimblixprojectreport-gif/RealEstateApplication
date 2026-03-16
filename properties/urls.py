@@ -1,4 +1,5 @@
 from django.urls import path
+from .views import PropertyPriceByLocationView
 from .views import (
     create_property,
     search_properties,
@@ -7,7 +8,6 @@ from .views import (
     delete_property,
     my_listings
 )
-from .views import PropertyPriceByLocationView
 
 urlpatterns = [
     path("create/", create_property),

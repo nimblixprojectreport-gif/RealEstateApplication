@@ -49,6 +49,7 @@ class Property(models.Model):
 
         return float(self.base_price) * multiplier
 
+    
     def __str__(self):
         return self.title
 

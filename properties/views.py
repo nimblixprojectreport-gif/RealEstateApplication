@@ -8,7 +8,6 @@ from .serializers import PropertySerializer
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-
 from .models import Property
 
 
