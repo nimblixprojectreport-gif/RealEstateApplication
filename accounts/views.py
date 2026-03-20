@@ -1,17 +1,15 @@
-from django.shortcuts import render
-from rest_framework_simplejwt.views import TokenObtainPairView
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
-from .serializers import ForgotPasswordSerializer, ResetPasswordSerializer, RegisterSerializer
+from django.conf import settings
+import jwt
+from datetime import datetime, timedelta
+from .serializers import ForgotPasswordSerializer, RegisterSerializer, ResetPasswordSerializer
 from django.contrib.auth import get_user_model
+
 User = get_user_model()
 
-
+# Forgot Password (generate token) 
 class ForgotPasswordView(APIView):
     authentication_classes = []   
     permission_classes = []       
@@ -20,30 +18,50 @@ class ForgotPasswordView(APIView):
         serializer = ForgotPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        email = serializer.validated_data['email']
+        email = serializer.validated_data["email"]
         user = User.objects.get(email=email)
 
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        token = default_token_generator.make_token(user)
+        payload = {
+            "user_id": str(user.id),
+            "exp": datetime.utcnow() + timedelta(minutes=10),
+            "iat": datetime.utcnow()
+        }
 
-        reset_link = f"http://localhost:8000/reset-password/?uid={uid}&token={token}"
+        token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
 
+        reset_link = f"http://localhost:3000/reset-password/{token}/"
+
+        print("Reset link:", reset_link)
 
         return Response({
             "message": "Reset link generated successfully",
-            "reset_link": reset_link
+            "token": token
         }, status=status.HTTP_200_OK)
 
 
-
+# Reset Password
 class ResetPasswordView(APIView):
     authentication_classes = []
     permission_classes = []
 
-    def post(self, request):
+    def post(self, request,):
         serializer = ResetPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+
+        token = serializer.validated_data["token"]
+        new_password = serializer.validated_data["password"]
+
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+            user = User.objects.get(id=payload["user_id"])
+        except jwt.ExpiredSignatureError:
+            return Response({"error": "Token expired"}, status=400)
+        except jwt.DecodeError:
+            return Response({"error": "Invalid token"}, status=400)
+        
+        user.set_password(new_password)
+        user.save()
+        
 
         return Response({
             "message": "Password updated successfully"

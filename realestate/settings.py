@@ -44,16 +44,18 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "accounts",
-    "properties",
-    "payments",
-    "reviews",
-    "subscriptions",
-    "notifications",
+    #"admin-logs",
+    "chat",
     "enquiries",
     "facility",
-    "chat",
     "favorites",
+    "notifications",
+    "payments",
+    "properties",
     "properties_owner",
+    "reviews",
+    "subscriptions", 
+    
 ]
 AUTH_USER_MODEL = "accounts.User"
 REST_FRAMEWORK = {
